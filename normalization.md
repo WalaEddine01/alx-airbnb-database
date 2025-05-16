@@ -1,0 +1,2 @@
+# Normalization
+# ![Normalization](DB.png)
