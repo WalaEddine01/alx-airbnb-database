@@ -1,9 +1,12 @@
+
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+
 -- Seed data for User table
-INSERT INTO User (user_id, first_name, last_name, email, password_hash, phone_number, role, created_at)
+INSERT INTO User (first_name, last_name, email, password_hash, phone_number, role, created_at)
 VALUES 
-  ('uuid-guest-1', 'Alice', 'Johnson', 'alice@example.com', 'hash1', '1234567890', 'guest', CURRENT_TIMESTAMP),
-  ('uuid-host-1', 'Bob', 'Smith', 'bob@example.com', 'hash2', '0987654321', 'host', CURRENT_TIMESTAMP),
-  ('uuid-admin-1', 'Admin', 'User', 'admin@example.com', 'adminhash', NULL, 'admin', CURRENT_TIMESTAMP);
+  ('Alice', 'Johnson', 'alice@example.com', 'hash1', '1234567890', 'guest', CURRENT_TIMESTAMP),
+  ('Bob', 'Smith', 'bob@example.com', 'hash2', '0987654321', 'host', CURRENT_TIMESTAMP),
+  ('Admin', 'User', 'admin@example.com', 'adminhash', NULL, 'admin', CURRENT_TIMESTAMP);
 
 -- Seed data for Property table
 INSERT INTO Property (property_id, host_id, name, description, location, pricepernight, created_at, updated_at)
