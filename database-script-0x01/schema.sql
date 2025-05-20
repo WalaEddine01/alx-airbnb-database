@@ -20,10 +20,23 @@ CREATE TABLE properties (
     location VARCHAR(255) NOT NULL,
     price_per_night DECIMAL(10,2) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 
     FOREIGN KEY (host_id) REFERENCES users(user_id)
 );
+CREATE OR REPLACE FUNCTION set_updated_at()
+RETURNS TRIGGER AS $$
+BEGIN
+    NEW.updated_at = NOW();
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+CREATE TRIGGER trigger_set_updated_at
+BEFORE UPDATE ON properties
+FOR EACH ROW
+EXECUTE FUNCTION set_updated_at();
+
+
 
 CREATE TYPE booking_status AS ENUM('pending', 'confirmed', 'canceled');
 
@@ -40,13 +53,13 @@ CREATE TABLE bookings (
     FOREIGN KEY (property_id) REFERENCES properties(property_id),
     FOREIGN KEY (user_id) REFERENCES users(user_id)
 );
-CREATE INDEX idx_proprerty_id ON bookings(property_id);
+CREATE INDEX idx_property_id ON bookings(property_id);
 
 CREATE TYPE payment_methods AS ENUM('credit_card', 'paypal', 'stripe');
 
 CREATE TABLE payments (
     payment_id UUID PRIMARY KEY,
-    booking_id UUID NOT NULL INDEX,
+    booking_id UUID NOT NULL,
     amount DECIMAL(10,2) NOT NULL,
     payment_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     payment_method payment_methods NOT NULL,
