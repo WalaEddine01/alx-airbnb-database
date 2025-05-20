@@ -1,26 +1,16 @@
+CREATE TYPE user_role AS ENUM('guest', 'host', 'admin');
+
 CREATE TABLE users (
     user_id UUID PRIMARY KEY,
     first_name VARCHAR(100) NOT NULL,
     last_name VARCHAR(100) NOT NULL,
-    email VARCHAR(255) UNIQUE NOT NULL,
+    email VARCHAR(255) UNIQUE NOT NULL, -- email is unique so it is indexed automatically 
     password_hash VARCHAR(255) NOT NULL,
     phone_number VARCHAR(20),
-    role ENUM('guest', 'host', 'admin') NOT NULL,
+    role user_role NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE properties (
-    property_id UUID PRIMARY KEY,
-    host_id UUID NOT NULL,
-    name VARCHAR(255) NOT NULL,
-    description TEXT NOT NULL,
-    location VARCHAR(255) NOT NULL,
-    price_per_night DECIMAL(10,2) NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-
-    FOREIGN KEY (host_id) REFERENCES users(user_id)
-);
 
 CREATE TABLE properties (
     property_id UUID PRIMARY KEY,
@@ -34,6 +24,8 @@ CREATE TABLE properties (
 
     FOREIGN KEY (host_id) REFERENCES users(user_id)
 );
+
+CREATE TYPE booking_status AS ENUM('pending', 'confirmed', 'canceled');
 
 CREATE TABLE bookings (
     booking_id UUID PRIMARY KEY,
@@ -42,22 +34,27 @@ CREATE TABLE bookings (
     start_date DATE NOT NULL,
     end_date DATE NOT NULL,
     total_price DECIMAL(10,2) NOT NULL,
-    status ENUM('pending', 'confirmed', 'canceled') NOT NULL,
+    status booking_status  NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 
     FOREIGN KEY (property_id) REFERENCES properties(property_id),
     FOREIGN KEY (user_id) REFERENCES users(user_id)
 );
+CREATE INDEX idx_proprerty_id ON bookings(property_id);
+
+CREATE TYPE payment_methods AS ENUM('credit_card', 'paypal', 'stripe');
 
 CREATE TABLE payments (
     payment_id UUID PRIMARY KEY,
-    booking_id UUID NOT NULL,
+    booking_id UUID NOT NULL INDEX,
     amount DECIMAL(10,2) NOT NULL,
     payment_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    payment_method ENUM('credit_card', 'paypal', 'stripe') NOT NULL,
+    payment_method payment_methods NOT NULL,
 
     FOREIGN KEY (booking_id) REFERENCES bookings(booking_id)
 );
+
+CREATE INDEX idx_booking_id ON payments(booking_id);
 
 CREATE TABLE reviews (
     review_id UUID PRIMARY KEY,
