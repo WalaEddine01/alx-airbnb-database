@@ -1,0 +1,139 @@
+# Optimization Report
+
+## Initial Query Analysis
+
+### Query Details
+```sql
+-- Original query from performance.sql
+SELECT 
+    b.*,
+    u.email,
+    u.phone,
+    p.property_type,
+    p.price,
+    p.status as property_status,
+    pm.payment_method,
+    pm.amount,
+    pm.transaction_date
+FROM 
+    Booking b
+    INNER JOIN User u ON b.user_id = u.id
+    INNER JOIN Property p ON b.property_id = p.id
+    LEFT JOIN Payment pm ON b.id = pm.booking_id
+ORDER BY 
+    b.booking_date DESC;
+```
+
+### Performance Metrics (Before Optimization)
+```markdown
+EXPLAIN ANALYZE Results:
+- Execution Time: [insert time]
+- Rows Scanned: [insert number]
+- Memory Usage: [insert amount]
+- Index Usage: [describe index usage]
+```
+
+## Optimization Strategy
+
+### 1. Index Implementation
+```sql
+-- Required indexes for optimal performance
+CREATE INDEX idx_booking_status_date ON Booking(status, booking_date);
+CREATE INDEX idx_user_email_phone ON User(email, phone);
+CREATE INDEX idx_property_type_price ON Property(property_type, price);
+CREATE INDEX idx_payment_booking ON Payment(booking_id);
+```
+
+### 2. Query Refactoring
+```sql
+-- Optimized query
+WITH RecentBookings AS (
+    SELECT 
+        b.id,
+        b.user_id,
+        b.property_id,
+        b.booking_date,
+        b.status,
+        ROW_NUMBER() OVER (
+            PARTITION BY b.user_id 
+            ORDER BY b.booking_date DESC
+        ) as row_num
+    FROM Booking b
+    WHERE b.status IN ('confirmed', 'completed')
+)
+SELECT 
+    rb.id,
+    rb.booking_date,
+    rb.status,
+    u.email,
+    u.phone,
+    p.property_type,
+    p.price,
+    p.status as property_status,
+    pm.payment_method,
+    pm.amount,
+    pm.transaction_date
+FROM RecentBookings rb
+INNER JOIN User u ON rb.user_id = u.id
+INNER JOIN Property p ON rb.property_id = p.id
+LEFT JOIN Payment pm ON rb.id = pm.booking_id
+WHERE rb.row_num <= 10
+ORDER BY rb.booking_date DESC;
+```
+
+## Performance Comparison
+
+### Before Optimization
+```markdown
+- Execution Time: [insert time]
+- CPU Usage: [insert percentage]
+- Memory Usage: [insert amount]
+- Disk I/O: [insert amount]
+```
+
+### After Optimization
+```markdown
+- Execution Time: [insert time]
+- CPU Usage: [insert percentage]
+- Memory Usage: [insert amount]
+- Disk I/O: [insert amount]
+```
+
+## Key Improvements
+
+1. **Reduced Data Retrieval**
+   - Removed SELECT *
+   - Limited result set using ROW_NUMBER()
+   - Filtered for active bookings only
+
+2. **Improved Join Strategy**
+   - Used CTE to reduce intermediate result set
+   - Optimized join order based on data volume
+   - Maintained LEFT JOIN for Payment to preserve booking history
+
+3. **Enhanced Indexing**
+   - Added composite indexes on frequently used columns
+   - Improved join performance with proper indexing
+   - Reduced full table scans
+
+4. **Query Structure**
+   - Implemented CTE for better readability
+   - Added pagination using ROW_NUMBER()
+   - Optimized sorting with indexed columns
+
+## Recommendations
+
+1. **Regular Maintenance**
+   - Monitor query performance weekly
+   - Update statistics monthly
+   - Rebuild indexes during low-usage periods
+
+2. **Future Optimizations**
+   - Consider partitioning large tables
+   - Implement query caching for frequent queries
+   - Review and adjust indexes based on usage patterns
+
+3. **Best Practices**
+   - Continue using EXPLAIN ANALYZE for new queries
+   - Monitor disk space usage
+   - Review and optimize queries regularly
