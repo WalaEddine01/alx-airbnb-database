@@ -24,7 +24,8 @@ SELECT
 FROM 
     properties p
 LEFT JOIN 
-    reviews r ON p.property_id = r.property_id;
+    reviews r ON p.property_id = r.property_id
+    ORDER BY r.rating
 
 -- Full outer Join
 SELECT 
