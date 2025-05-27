@@ -1,16 +1,16 @@
 -- Inner Join
 SELECT 
-    b.booking_id,
-    b.property_id,
-    b.user_id,
-    b.booking_date,
     u.user_id,
-    u.name,
-    u.email
-FROM 
-    bookings b
-INNER JOIN 
-    users u ON b.user_id = u.user_id;
+    u.first_name,
+    u.last_name,
+    b.booking_id,
+    b.start_date,
+    b.end_date,
+    b.total_price,
+    b.status
+FROM users u
+INNER JOIN bookings b ON u.user_id = b.user_id
+ORDER BY b.start_date DESC;
 
 -- Left Join
 SELECT 
