@@ -29,12 +29,13 @@ ORDER BY p.name;
 -- Full outer Join
 SELECT 
     u.user_id,
-    u.name,
-    u.email,
+    u.first_name,
+    u.last_name,
     b.booking_id,
-    b.property_id,
-    b.booking_date
-FROM 
-    users u
-FULL OUTER JOIN 
-    bookings b ON u.user_id = b.user_id;
+    b.start_date,
+    b.end_date,
+    b.total_price,
+    b.status
+FROM users u
+FULL OUTER JOIN bookings b ON u.user_id = b.user_id
+ORDER BY COALESCE(u.user_id, b.user_id);
