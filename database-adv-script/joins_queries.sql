@@ -15,17 +15,16 @@ ORDER BY b.start_date DESC;
 -- Left Join
 SELECT 
     p.property_id,
-    p.title,
-    p.description,
+    p.name,
+    p.location,
+    p.price_per_night,
     r.review_id,
-    r.property_id,
     r.rating,
-    r.comment
-FROM 
-    properties p
-LEFT JOIN 
-    reviews r ON p.property_id = r.property_id
-    ORDER BY r.rating
+    r.comment,
+    r.created_at
+FROM properties p
+LEFT JOIN reviews r ON p.property_id = r.property_id
+ORDER BY p.name;
 
 -- Full outer Join
 SELECT 
