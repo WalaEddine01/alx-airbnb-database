@@ -26,11 +26,7 @@ ORDER BY
 
 ### Performance Metrics (Before Optimization)
 ```markdown
-EXPLAIN ANALYZE Results:
-- Execution Time: [insert time]
-- Rows Scanned: [insert number]
-- Memory Usage: [insert amount]
-- Index Usage: [describe index usage]
+
 ```
 
 ## Optimization Strategy
@@ -85,18 +81,12 @@ ORDER BY rb.booking_date DESC;
 
 ### Before Optimization
 ```markdown
-- Execution Time: [insert time]
-- CPU Usage: [insert percentage]
-- Memory Usage: [insert amount]
-- Disk I/O: [insert amount]
+
 ```
 
 ### After Optimization
 ```markdown
-- Execution Time: [insert time]
-- CPU Usage: [insert percentage]
-- Memory Usage: [insert amount]
-- Disk I/O: [insert amount]
+
 ```
 
 ## Key Improvements
